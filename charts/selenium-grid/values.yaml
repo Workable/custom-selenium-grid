@@ -1,7 +1,7 @@
 global:
   seleniumGrid:
     # Image tag for all selenium components
-    imageTag: 4.9.1-20230508
+    imageTag: 4.9.0
     # Image tag for browser's nodes
     nodesImageTag: 4.9.1-20230508
     # Pull secret for all components, can be overridden individually
@@ -13,7 +13,7 @@ isolateComponents: false
 # Configure the ingress resource to access the Grid installation.
 ingress:
   # Enable or disable ingress resource
-  enabled: true
+  enabled: false
   # Name of ingress class to select which controller will implement ingress resource
   className: ""
   # Custom annotations for ingress resource
@@ -24,7 +24,6 @@ ingress:
   path: /
   # TLS backend configuration for ingress resource
   tls: []
-  path: /
 
 # ConfigMap that contains SE_EVENT_BUS_HOST, SE_EVENT_BUS_PUBLISH_PORT and SE_EVENT_BUS_SUBSCRIBE_PORT variables
 busConfigMap:
@@ -247,7 +246,9 @@ hub:
   # Custom annotations for Selenium Hub pods
   annotations: {}
   # Custom labels for Selenium Hub pods
-  labels: {}
+  labels:
+    process: web
+    release: selenium-hub
   # Port where events are published
   publishPort: 4442
   # Port where to subscribe for events
@@ -390,7 +391,15 @@ chromeNode:
   - name: DRAIN_AFTER_SESSION_COUNT
     value: '{{- and (eq (include "seleniumGrid.useKEDA" .) "true") (eq .Values.autoscaling.scalingType "job") | ternary "1" "0" -}}'
   - name: SE_NODE_GRID_URL
-    value: '{{ include "seleniumGrid.url" .}}'
+    value: 'https://selenium.thasos.sre-gke.workableops.net'
+  - name: SE_SCREEN_WIDTH
+    value: '1920'
+  - name: SE_SCREEN_HEIGHT
+    value: '1080'
+  - name: SE_SESSION_REQUEST_TIMEOUT
+    value: '500'
+  - name: SE_SESSION_RETRY_INTERVAL
+    value: '2'
     # - name: SE_JAVA_OPTS
     #   value: "-Xmx512m"
     # - name:
@@ -457,7 +466,7 @@ firefoxNode:
   deploymentEnabled: true
 
   # Number of firefox nodes
-  replicas: 1
+  replicas: 0
   # Image of firefox nodes
   imageName: selenium/node-firefox
   # Image of firefox nodes (this overwrites global.seleniumGrid.nodesImageTag)
@@ -570,7 +579,7 @@ edgeNode:
   deploymentEnabled: true
 
   # Number of edge nodes
-  replicas: 1
+  replicas: 0
   # Image of edge nodes
   imageName: selenium/node-edge
   # Image of edge nodes (this overwrites global.seleniumGrid.nodesImageTag)
