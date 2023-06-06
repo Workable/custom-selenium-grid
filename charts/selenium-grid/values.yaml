@@ -447,7 +447,7 @@ chromeNode:
   #   persistentVolumeClaim:
   #     claimName: my-pv-claim
 
-  maxReplicaCount: 8
+  maxReplicaCount: 10
   hpa:
     url: '{{ include "seleniumGrid.graphqlURL" . }}'
     browserName: chrome
